@@ -38,7 +38,7 @@ void drawPoint(SDL_Event e){
 	printf("Dessiner point !\n");
 
 	glBegin(GL_POINTS);;
-	glColor3ub(0,0,0);
+	glColor3d(0,0,0);
 	glVertex2f(-1 + 2. * e.button.x / WINDOW_WIDTH, -(-1 +2. * e.button.y / WINDOW_HEIGHT));
 	glEnd();
 
@@ -53,7 +53,7 @@ void drawLine(SDL_Event e, float tab[]){
 	printf("Dessiner ligne !\n");
 
 	glBegin(GL_LINES);
-	glColor3ub(0,0,0);
+	glColor3d(0,0,0);
 
 	//Coordonnées du point précédement enregistré dans tabLine 
 	glVertex2f(-1 + 2. * tab[0] / WINDOW_WIDTH, -(-1 +2. * tab[1] / WINDOW_HEIGHT));
@@ -73,7 +73,7 @@ void drawTriangle(SDL_Event e, float tab[]){
 	printf("Dessiner triangle !\n");
 
 	glBegin(GL_TRIANGLES);
-	glColor3ub(0,0,0);
+	glColor3d(0,0,0);
 
 	//Coordonnées du point précédement enregistré dans tabLine 
 	glVertex2f(-1 + 2. * tab[0] / WINDOW_WIDTH, -(-1 +2. * tab[1] / WINDOW_HEIGHT));
@@ -90,18 +90,70 @@ void drawTriangle(SDL_Event e, float tab[]){
 
 void drawQuad(){
 
-	float larg = WINDOW_WIDTH/8;
+	//float taille = (float)WINDOW_WIDTH/8;
+	//printf("Largeur %f\n",taille);
+
 	printf("Dessiner rectangle !\n");
 
-    glBegin(GL_QUADS);                      	// Draw A Quad
-
-    glColor3ub(0,0,0);
-
-    glVertex2f(-1.0f, 1.0f);              // Top Left
+    glBegin(GL_QUADS);  
+                    
+    /* BLANC */
+    glColor3d(1,1,1);	
+    glVertex2f(-1.0f, 1.0f);              		// Top Left
     glVertex2f(1.0f*(-0.8), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.8), -1.0f);              // Bottom Right
-    glVertex2f(-1.0f,-1.0f);              // Bottom Left
-    glEnd();                            		// Done Drawing The Quad
+    glVertex2f(1.0f*(-0.8), -1.0f);             // Bottom Right
+    glVertex2f(-1.0f,-1.0f);              		// Bottom Left
+
+    /* NOIR */
+    glColor3d(0,0,0);
+    glVertex2f(1.0f*(-0.8), 1.0f);              // Top Left
+    glVertex2f(1.0f*(-0.6), 1.0f);              // Top Right
+    glVertex2f(1.0f*(-0.6), -1.0f);             // Bottom Right
+    glVertex2f(1.0f*(-0.8),-1.0f);   			// Bottom Left
+
+    /* ROUGE */
+    glColor3d(1,0,0);
+    glVertex2f(1.0f*(-0.6), 1.0f);              // Top Left
+    glVertex2f(1.0f*(-0.4), 1.0f);              // Top Right
+    glVertex2f(1.0f*(-0.4), -1.0f);             // Bottom Right
+    glVertex2f(1.0f*(-0.6),-1.0f);   			// Bottom Left
+
+    /* VERT */
+    glColor3d(0,1,0);
+    glVertex2f(1.0f*(-0.4), 1.0f);              // Top Left
+    glVertex2f(1.0f*(-0.2), 1.0f);              // Top Right
+    glVertex2f(1.0f*(-0.2), -1.0f);             // Bottom Right
+    glVertex2f(1.0f*(-0.4),-1.0f);   			// Bottom Left
+
+    /* BLEU */
+    glColor3d(0,0,1);
+    glVertex2f(1.0f*(-0.2), 1.0f);              // Top Left
+    glVertex2f(1.0f*(-0.0), 1.0f);              // Top Right
+    glVertex2f(1.0f*(-0.0), -1.0f);             // Bottom Right
+    glVertex2f(1.0f*(-0.2),-1.0f);   			// Bottom Left
+
+    /* JAUNE */
+    glColor3d(1,1,0);
+    glVertex2f(1.0f*(+0.0), 1.0f);              // Top Left
+    glVertex2f(1.0f*(+0.2), 1.0f);              // Top Right
+    glVertex2f(1.0f*(+0.2), -1.0f);             // Bottom Right
+    glVertex2f(1.0f*(+0.0),-1.0f);   			// Bottom Left
+	
+    /* BLEU CIEL */
+    glColor3d(0,1,1);
+    glVertex2f(1.0f*(+0.2), 1.0f);              // Top Left
+    glVertex2f(1.0f*(+0.4), 1.0f);              // Top Right
+    glVertex2f(1.0f*(+0.4), -1.0f);             // Bottom Right
+    glVertex2f(1.0f*(+0.2),-1.0f);   			// Bottom Left
+
+    /* ROSE */
+    glColor3d(1,0,1);
+    glVertex2f(1.0f*(+0.4), 1.0f);              // Top Left
+    glVertex2f(1.0f*(+0.6), 1.0f);              // Top Right
+    glVertex2f(1.0f*(+0.6), -1.0f);             // Bottom Right
+    glVertex2f(1.0f*(+0.4),-1.0f);   			// Bottom Left
+
+    glEnd();                            		
   
 }
 
