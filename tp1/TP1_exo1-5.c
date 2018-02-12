@@ -31,85 +31,21 @@ void resizeWindow(SDL_Event e){
 
 }
 
-void drawPoint(SDL_Event e){
+void drawObject(SDL_Event e){
     
     glPointSize(10.0f);
 
-	printf("Dessiner point !\n");
-
-	glBegin(GL_POINTS);;
+	printf("Dessiner !\n");
+	glBegin(GL_POINTS);
 	glColor3ub(0,0,0);
 	glVertex2f(-1 + 2. * e.button.x / WINDOW_WIDTH, -(-1 +2. * e.button.y / WINDOW_HEIGHT));
 	glEnd();
 
 }
 
-void drawLine(SDL_Event e, float tab[]){
-
-	drawPoint(e);
-
-    glPointSize(10.0f);
-
-	printf("Dessiner ligne !\n");
-
-	glBegin(GL_LINES);
-	glColor3ub(0,0,0);
-
-	//Coordonnées du point précédement enregistré dans tabLine 
-	glVertex2f(-1 + 2. * tab[0] / WINDOW_WIDTH, -(-1 +2. * tab[1] / WINDOW_HEIGHT));
-
-  	//Coordonées du nouveau point cliqué
-  	glVertex2f(-1 + 2. * e.button.x / WINDOW_WIDTH, -(-1 +2. * e.button.y / WINDOW_HEIGHT));
-	glEnd();
-
-}
-
-void drawTriangle(SDL_Event e, float tab[]){
-
-	drawPoint(e);
-	
-    glPointSize(10.0f);
-
-	printf("Dessiner triangle !\n");
-
-	glBegin(GL_TRIANGLES);
-	glColor3ub(0,0,0);
-
-	//Coordonnées du point précédement enregistré dans tabLine 
-	glVertex2f(-1 + 2. * tab[0] / WINDOW_WIDTH, -(-1 +2. * tab[1] / WINDOW_HEIGHT));
-
-	//Coordonnées du point précédement enregistré dans tabLine 
-	glVertex2f(-1 + 2. * tab[2] / WINDOW_WIDTH, -(-1 +2. * tab[3] / WINDOW_HEIGHT));
-
-  	//Coordonées du nouveau point cliqué
-  	glVertex2f(-1 + 2. * e.button.x / WINDOW_WIDTH, -(-1 +2. * e.button.y / WINDOW_HEIGHT));
-
-	glEnd();
-
-}
-
-void drawQuad(){
-
-	float larg = WINDOW_WIDTH/8;
-	printf("Dessiner rectangle !\n");
-
-    glBegin(GL_QUADS);                      	// Draw A Quad
-
-    glColor3ub(0,0,0);
-
-    glVertex2f(-1.0f, 1.0f);              // Top Left
-    glVertex2f(1.0f*(-0.8), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.8), -1.0f);              // Bottom Right
-    glVertex2f(-1.0f,-1.0f);              // Bottom Left
-    glEnd();                            		// Done Drawing The Quad
-  
-}
-
 int main(int argc, char** argv) {
 
-	char touche = 'p';
-	float tabLine[3]={0,0,0}; // Toutes les cases valent 0
-	float tabTriangle[5]={0,0,0,0,0}; // Toutes les cases valent 0
+
 
     /* Initialisation de la SDL */
     if(-1 == SDL_Init(SDL_INIT_VIDEO)) {
@@ -159,60 +95,7 @@ int main(int argc, char** argv) {
 
                 /* Clic souris */
                 case SDL_MOUSEBUTTONUP:
-
-
-                	switch(touche){
-
-                		case 'p':
-                			drawPoint(e);
-                			break;
-
-                		case 'l':
-
-	                		if(tabLine[2] == 0){
-	                			tabLine[0] = e.button.x;
-	                			tabLine[1] = e.button.y;
-	                			tabLine[2] = 1;
-	                			drawPoint(e);
-	                			printf("TabLine x=%f et y=%f\n", tabLine[0], tabLine[1]);
-	                		}else{
-	                			drawLine(e, tabLine);
-	                			int i;
-	                			for(i=0;i<3;i++){
-	                				tabLine[i]=0;
-	                			}
-	                		}
-	                		break;
-
-	                	case 't':
-
-	                		if(tabTriangle[4] == 0){
-	                			tabTriangle[0] = e.button.x;
-	                			tabTriangle[1] = e.button.y;
-	                			tabTriangle[4] = 1;
-	                			drawPoint(e);        
-	                		}else if(tabTriangle[4]==1){
-	                			tabTriangle[2] = e.button.x;
-	                			tabTriangle[3] = e.button.y;
-	                			tabTriangle[4] = 2;
-	                			drawPoint(e);
-	                		}else{
-	                			drawTriangle(e, tabTriangle);
-	                			int i;
-	                			for(i=0;i<5;i++){
-	                				tabTriangle[i]=0;
-	                			}
-	                		}
-	                		break;
-
-	                	case ' ':
-	                		drawQuad();
-	                		break;
-
-                		default:
-                			break;
-                	}
-
+                	drawObject(e);
                     printf("clic en (%d, %d)\n", e.button.x, e.button.y);
                     glClearColor(e.button.x/(float)WINDOW_WIDTH,e.button.y/(float)WINDOW_HEIGHT,0,1);
                     break;
@@ -228,11 +111,6 @@ int main(int argc, char** argv) {
                     if(e.key.keysym.sym == 'q'){
                         loop=0;
                     }
-
-                    /* On determine ce que l'utilisateur souhaite dessiner et on l'enregistre dans 'touche' */
-                    touche = e.key.keysym.sym;
-                    printf("valeur de 'touche' (code = %c)\n", touche);
-                    /********************************************************************/
 
                     printf("touche pressée (code = %d)\n", e.key.keysym.sym);
                     glClearColor(1,0,1,1);
