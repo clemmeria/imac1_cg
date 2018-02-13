@@ -185,12 +185,16 @@ void drawQuad(){
 
 }
 
+void drawClean(){                         		
+
+}
+
 int main(int argc, char** argv) {
 
 	char touche = 'p';
 	float tabLine[3]={0,0,0}; // Toutes les cases valent 0
 	float tabTriangle[5]={0,0,0,0,0}; // Toutes les cases valent 0
-
+	
     /* Initialisation de la SDL */
     if(-1 == SDL_Init(SDL_INIT_VIDEO)) {
         fprintf(stderr, "Impossible d'initialiser la SDL. Fin du programme.\n");
@@ -284,11 +288,7 @@ int main(int argc, char** argv) {
 	                			}
 	                		}
 	                		break;
-
-	                	case ' ':
-	                		drawQuad();
-	                		break;
-
+	    
                 		default:
                 			break;
                 	}
@@ -305,8 +305,13 @@ int main(int argc, char** argv) {
 
                 /* Touche clavier */
                 case SDL_KEYDOWN:
+
                     if(e.key.keysym.sym == 'q'){
                         loop=0;
+                    }
+                    else if(e.key.keysym.sym == ' '){
+                    printf("Touche espace pressée\n");
+                    drawQuad();
                     }
 
                     /* On determine ce que l'utilisateur souhaite dessiner et on l'enregistre dans 'touche' */
@@ -317,6 +322,15 @@ int main(int argc, char** argv) {
                     printf("touche pressée (code = %d)\n", e.key.keysym.sym);
                     glClearColor(1,0,1,1);
                     break;
+
+                 case SDL_KEYUP:
+
+                 	if(e.key.keysym.sym == ' '){
+                    printf("Touche espace relarchée\n");
+                    drawClean();
+                    }
+
+                 	break;
 
                 default:
                     break;
