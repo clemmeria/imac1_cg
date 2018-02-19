@@ -20,6 +20,13 @@ static const unsigned int BIT_PER_PIXEL = 32;
 /* Nombre minimal de millisecondes separant le rendu de deux images */
 static const Uint32 FRAMERATE_MILLISECONDS = 1000 / 60;
 
+
+/* Prototypes */
+float coorX(float x);
+float coorY(float y);
+
+
+
 void resizeWindow(SDL_Event e){
 
     SDL_SetVideoMode(e.resize.w, e.resize.h, BIT_PER_PIXEL, SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_RESIZABLE);
@@ -30,20 +37,30 @@ void resizeWindow(SDL_Event e){
 
 }
 
-void drawPoint(SDL_Event e){
-    
-    glPointSize(10.0f);
+void drawPoint(PointListe* listePoints){
 
 	printf("Dessiner point !\n");
+	PointListe tmp = (PointListe)malloc(sizeof(PointListe));
+	tmp = *listePoints;
 
-	glBegin(GL_POINTS);;
-	glColor3d(0,0,0);
-	glVertex2f(-1 + 2. * e.button.x / WINDOW_WIDTH, -(-1 +2. * e.button.y / WINDOW_HEIGHT));
-	glEnd();
+
+	while(tmp != NULL){
+		
+		glPointSize(10.0f);
+		glBegin(GL_POINTS);;
+		glColor3d(0,0,0);
+		glVertex2f(coorX(tmp->x), coorY(tmp->y)); 
+		glEnd();
+
+		tmp = tmp->next;
+
+	}
+
+    
 
 }
 
-void drawLine(SDL_Event e, float tab[]){
+/*void drawLine(SDL_Event e, float tab[]){
 
 	drawPoint(e);
 
@@ -85,7 +102,7 @@ void drawTriangle(SDL_Event e, float tab[]){
 
 	glEnd();
 
-}
+}*/
 
 float coorX(float x){
 	return (-1 + 2. * x / WINDOW_WIDTH);
@@ -141,20 +158,32 @@ Point* allocPoint(float x, float y, unsigned char r, unsigned char g, unsigned c
 		tmp->next = NULL;
 	}
 
+	printf("%f\n", tmp->x);
+
 	return tmp;
 
 }
 
 void addPointToList(Point* point, PointListe* list){
 
-	/*if(list!=NULL){
+	//printf("%f\n", tmp->next->x);
 
-		while(list->next!=NULL){
-			list=list->next;
+	if(*list!=NULL){
+
+		PointListe tmp = (PointListe)malloc(sizeof(PointListe));
+		tmp = *list;
+
+
+		while(tmp->next != NULL){
+			tmp = tmp->next;
 		}
+		tmp->next = point;
+		printf("X vaut %f\n", tmp->next->x);
 
-		list->next=point;
-	}*/
+	}else{
+		*list = point;
+		printf("X2 vaut %f\n", (*list)->x);
+	}
 
 
 
@@ -174,7 +203,13 @@ void reDraw(){
 int main(int argc, char** argv) {
 
 
-	PointListe ListePoints;
+	PointListe listePoints;
+	listePoints = (PointListe)malloc(sizeof(PointListe));
+	if(listePoints!=NULL){
+		listePoints=NULL;
+	}else{
+		exit(0);
+	}
 
 	char touche = 'p';
 	float tabLine[3]={0,0,0}; // Toutes les cases valent 0
@@ -233,10 +268,11 @@ int main(int argc, char** argv) {
                 	switch(touche){
 
                 		case 'p':
-                			drawPoint(e);
+                			addPointToList(allocPoint(e.button.x, e.button.y, 0, 0, 0), &listePoints);
+                			drawPoint(&listePoints);
                 			break;
 
-                		case 'l':
+                		/*case 'l':
 
 	                		if(tabLine[2] == 0){
 	                			tabLine[0] = e.button.x;
@@ -272,7 +308,7 @@ int main(int argc, char** argv) {
 	                				tabTriangle[i]=0;
 	                			}
 	                		}
-	                		break;
+	                		break;*/
 	    
                 		default:
                 			break;
@@ -284,7 +320,7 @@ int main(int argc, char** argv) {
 
                 /* Mouvement souris */
                 case SDL_MOUSEMOTION:
-                    printf("clic en (%d, %d)\n", e.button.x, e.button.y);
+                    //printf("clic en (%d, %d)\n", e.button.x, e.button.y);
                     glClearColor(e.button.x/(float)WINDOW_WIDTH,e.button.y/(float)WINDOW_HEIGHT,0,1);
                     break;
 
@@ -313,6 +349,7 @@ int main(int argc, char** argv) {
                  	if(e.key.keysym.sym == ' '){
                     printf("Touche espace relarchée\n");
                     drawClean();
+                    drawPoint(&listePoints);
                     }
 
                  	break;
