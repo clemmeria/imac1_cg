@@ -48,7 +48,7 @@ void drawPoint(PointListe* listePoints){
 		
 		glPointSize(10.0f);
 		glBegin(GL_POINTS);;
-		glColor3d(0,0,0);
+		glColor3d(tmp->r,tmp->g,tmp->b);
 		glVertex2f(coorX(tmp->x), coorY(tmp->y)); 
 		glEnd();
 
@@ -166,8 +166,6 @@ Point* allocPoint(float x, float y, unsigned char r, unsigned char g, unsigned c
 
 void addPointToList(Point* point, PointListe* list){
 
-	//printf("%f\n", tmp->next->x);
-
 	if(*list!=NULL){
 
 		PointListe tmp = (PointListe)malloc(sizeof(PointListe));
@@ -178,11 +176,9 @@ void addPointToList(Point* point, PointListe* list){
 			tmp = tmp->next;
 		}
 		tmp->next = point;
-		printf("X vaut %f\n", tmp->next->x);
 
 	}else{
 		*list = point;
-		printf("X2 vaut %f\n", (*list)->x);
 	}
 
 
@@ -196,9 +192,73 @@ void drawClean(){
 
 }
 
-void reDraw(){
+void changerCouleur(float x, char* tabCoul){
+
+	int caseCoul = (int)((x/WINDOW_WIDTH)*8);
+
+	
+	switch(caseCoul){
+
+		case 0:
+			tabCoul[0] = 0;
+			tabCoul[1] = 0;
+			tabCoul[2] = 0;
+			break;
+		case 1:
+			tabCoul[0] = 0;
+			tabCoul[1] = 0;
+			tabCoul[2] = 1;
+			break;
+		case 2:
+			tabCoul[0] = 0;
+			tabCoul[1] = 1;
+			tabCoul[2] = 0;
+			break;
+		case 3:
+			tabCoul[0] = 0;
+			tabCoul[1] = 1;
+			tabCoul[2] = 1;
+			break;
+		case 4:
+			tabCoul[0] = 1;
+			tabCoul[1] = 0;
+			tabCoul[2] = 0;
+			break;
+		case 5:
+			tabCoul[0] = 1;
+			tabCoul[1] = 0;
+			tabCoul[2] = 1;
+			break;
+		case 6:
+			tabCoul[0] = 1;
+			tabCoul[1] = 1;
+			tabCoul[2] = 0;
+			break;
+		case 7:
+			tabCoul[0] = 1;
+			tabCoul[1] = 1;
+			tabCoul[2] = 1;
+			break;
+		default:
+			break;
+
+	}
 
 }
+
+
+void deletePoints(PointListe* list){
+
+	PointListe tmp;
+	if(*list != NULL){
+		tmp = *list;
+		*list = (*list)->next;
+		free(tmp);
+	}
+	*list = NULL;
+}
+
+
 
 int main(int argc, char** argv) {
 
@@ -210,6 +270,8 @@ int main(int argc, char** argv) {
 	}else{
 		exit(0);
 	}
+
+	char tabCoul[4]={0,0,0,'\0'};
 
 	char touche = 'p';
 	float tabLine[3]={0,0,0}; // Toutes les cases valent 0
@@ -268,9 +330,16 @@ int main(int argc, char** argv) {
                 	switch(touche){
 
                 		case 'p':
-                			addPointToList(allocPoint(e.button.x, e.button.y, 0, 0, 0), &listePoints);
+                			addPointToList(allocPoint(e.button.x, e.button.y, tabCoul[0], tabCoul[1], tabCoul[2]), &listePoints);
                 			drawPoint(&listePoints);
                 			break;
+
+                		case ' ':
+                			printf("Recherche de couleurs\n");
+                			changerCouleur(e.button.x, tabCoul);
+                			break;
+
+                		
 
                 		/*case 'l':
 
@@ -327,16 +396,25 @@ int main(int argc, char** argv) {
                 /* Touche clavier */
                 case SDL_KEYDOWN:
 
+
                     if(e.key.keysym.sym == 'q'){
+                    	deletePoints(&listePoints);
                         loop=0;
-                    }
-                    else if(e.key.keysym.sym == ' '){
-                    printf("Touche espace pressée\n");
-                    drawQuad();
+                    } else if(e.key.keysym.sym == ' '){
+	                    printf("Touche espace pressée\n");
+	                    drawQuad();
+                    }else if(e.key.keysym.sym == 'd'){
+                		deletePoints(&listePoints);
+                		drawClean();
+                		drawPoint(&listePoints);
                     }
 
                     /* On determine ce que l'utilisateur souhaite dessiner et on l'enregistre dans 'touche' */
-                    touche = e.key.keysym.sym;
+                    if(e.key.keysym.sym != 'd'){
+                    	touche = e.key.keysym.sym;
+                    }
+
+                    
                     printf("valeur de 'touche' (code = %c)\n", touche);
                     /********************************************************************/
 
@@ -350,6 +428,7 @@ int main(int argc, char** argv) {
                     printf("Touche espace relarchée\n");
                     drawClean();
                     drawPoint(&listePoints);
+                    touche = 'p';
                     }
 
                  	break;
