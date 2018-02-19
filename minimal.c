@@ -4,12 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//1.
-// Inclure les librairies SDL et OpenGL
-
-//2.
-// 
-
+typedef struct Point{
+	float x,y; // Position 2D du point
+	unsigned char r,g,b; // Couleur du point
+	struct Point* next; // Point suivant à dessiner
+}Point,*PointListe;
 
 /* Dimensions de la fenêtre */
 static unsigned int WINDOW_WIDTH = 400;
@@ -88,108 +87,94 @@ void drawTriangle(SDL_Event e, float tab[]){
 
 }
 
-void drawQuad(){
+float coorX(float x){
+	return (-1 + 2. * x / WINDOW_WIDTH);
+}
 
-	//float taille = (float)WINDOW_WIDTH/8;
-	//printf("Largeur %f\n",taille);
+float coorY(float y){
+	return -(-1 +2. * y / WINDOW_HEIGHT);
+}
+
+void drawUnQuad(c1, c2, c3, x1){
+
+	glBegin(GL_QUADS);  
+	glColor3d(c1,c2,c3);
+	glVertex2f(coorX(x1), coorY(0));
+	glVertex2f(coorX(x1+50), coorY(0));
+	glVertex2f(coorX(x1+50), coorY(400));  
+	glVertex2f(coorX(x1), coorY(400)); 
 	
-	printf("Dessiner rectangle !\n");
+	glEnd();   
 
-    glBegin(GL_QUADS);  
-                    
-    /* BLANC */
-    glColor3d(1,1,1);	
-    glVertex2f(-1.0f, 1.0f);              		// Top Left
-    glVertex2f(1.0f*(-0.75), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.75), -1.0f);             // Bottom Right
-    glVertex2f(-1.0f,-1.0f);              		// Bottom Left
-
-    /* NOIR */
-    glColor3d(0,0,0);
-    glVertex2f(1.0f*(-0.75), 1.0f);              // Top Left
-    glVertex2f(1.0f*(-0.5), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.5), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(-0.75),-1.0f);   			// Bottom Left
-
-    /* ROUGE */
-    glColor3d(1,0,0);
-    glVertex2f(1.0f*(-0.5), 1.0f);              // Top Left
-    glVertex2f(1.0f*(-0.25), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.25), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(-0.5),-1.0f);   			// Bottom Left
-
-    /* VERT */
-    glColor3d(0,1,0);
-    glVertex2f(1.0f*(-0.25), 1.0f);              // Top Left
-    glVertex2f(1.0f*(-0.0), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.0), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(-0.25),-1.0f);   			// Bottom Left
-
-    /* BLANC */
-    glColor3d(1,1,1);	
-    glVertex2f(-1.0f, 1.0f);              		// Top Left
-    glVertex2f(1.0f*(-0.75), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.75), -1.0f);             // Bottom Right
-    glVertex2f(-1.0f,-1.0f);              		// Bottom Left
-
-    /* NOIR */
-    glColor3d(0,0,0);
-    glVertex2f(1.0f*(-0.75), 1.0f);              // Top Left
-    glVertex2f(1.0f*(-0.5), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.5), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(-0.75),-1.0f);   			// Bottom Left
-
-    /* ROUGE */
-    glColor3d(1,0,0);
-    glVertex2f(1.0f*(-0.5), 1.0f);              // Top Left
-    glVertex2f(1.0f*(-0.25), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.25), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(-0.5),-1.0f);   			// Bottom Left
-
-    /* VERT */
-    glColor3d(0,1,0);
-    glVertex2f(1.0f*(-0.25), 1.0f);              // Top Left
-    glVertex2f(1.0f*(-0.0), 1.0f);              // Top Right
-    glVertex2f(1.0f*(-0.0), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(-0.25),-1.0f);   			// Bottom Left
-
-    /* BLEU */
-    glColor3d(0,0,1);
-    glVertex2f(1.0f*(+0.0), 1.0f);              // Top Left
-    glVertex2f(1.0f*(+0.25), 1.0f);              // Top Right
-    glVertex2f(1.0f*(+0.25), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(+0.0),-1.0f);   			// Bottom Left
-
-    /* JAUNE */
-    glColor3d(1,1,0);
-    glVertex2f(1.0f*(+0.25), 1.0f);              // Top Left
-    glVertex2f(1.0f*(+0.5), 1.0f);              // Top Right
-    glVertex2f(1.0f*(+0.5), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(+0.25),-1.0f);   			// Bottom Left
-
-    /* CYAN */
-    glColor3d(0,1,1);
-    glVertex2f(1.0f*(+0.5), 1.0f);              // Top Left
-    glVertex2f(1.0f*(+0.75), 1.0f);              // Top Right
-    glVertex2f(1.0f*(+0.75), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(+0.5),-1.0f);   			// Bottom Left
-
-    /* ROSE */
-    glColor3d(1,0,1);
-    glVertex2f(1.0f*(+0.75), 1.0f);              // Top Left
-    glVertex2f(1.0f*(+1), 1.0f);              // Top Right
-    glVertex2f(1.0f*(+1), -1.0f);             // Bottom Right
-    glVertex2f(1.0f*(+0.75),-1.0f);   			// Bottom Left
-
-    glEnd();                            		
 
 }
 
-void drawClean(){                         		
+void drawQuad(){
+	
+	printf("Dessiner rectangle !\n");
+
+	int c1,c2,c3;
+	int x1 = 0;
+
+	for(c1=0; c1<2; c1++){
+		for(c2=0;c2<2;c2++){
+			for(c3=0;c3<2;c3++){
+				drawUnQuad(c1,c2,c3,x1);
+				x1+=50;
+			}
+		}
+	}       		
+
+}
+
+
+Point* allocPoint(float x, float y, unsigned char r, unsigned char g, unsigned char b){
+
+	Point* tmp;
+	tmp = (Point*)malloc(sizeof(Point));
+	if(tmp!=NULL){
+		tmp->x = x;
+		tmp->y = y;
+		tmp->r = r;
+		tmp->g = g;
+		tmp->b = b;
+		tmp->next = NULL;
+	}
+
+	return tmp;
+
+}
+
+void addPointToList(Point* point, PointListe* list){
+
+	/*if(list!=NULL){
+
+		while(list->next!=NULL){
+			list=list->next;
+		}
+
+		list->next=point;
+	}*/
+
+
+
+}
+
+void drawClean(){    
+
+    glClearColor(1,1,0,1); // definir la couleur de nettoyage (Jaune)
+    glClear(GL_COLOR_BUFFER_BIT); // Nettoie la fenetre et appelle la couleur de nettoyage
+
+}
+
+void reDraw(){
 
 }
 
 int main(int argc, char** argv) {
+
+
+	PointListe ListePoints;
 
 	char touche = 'p';
 	float tabLine[3]={0,0,0}; // Toutes les cases valent 0
