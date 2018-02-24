@@ -10,6 +10,13 @@ typedef struct Point{
 	struct Point* next; // Point suivant à dessiner
 }Point,*PointListe;
 
+typedef struct Primitive{
+	GLenum primitiveType;
+	PointListe points;
+	struct Primitive* next;
+}Primitive, *PrimitiveListe;
+
+
 /* Dimensions de la fenêtre */
 static unsigned int WINDOW_WIDTH = 400;
 static unsigned int WINDOW_HEIGHT = 400;
@@ -27,26 +34,26 @@ float coorY(float y);
 
 
 
-void resizeWindow(SDL_Event e){
+void resizeWindow(){
 
-    SDL_SetVideoMode(e.resize.w, e.resize.h, BIT_PER_PIXEL, SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_RESIZABLE);
-    glViewport(0,0,e.resize.w, e.resize.h);
+    glViewport(0,0,WINDOW_WIDTH, WINDOW_HEIGHT);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(-1.,1.,-1.,1.);
+    SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, BIT_PER_PIXEL, SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_RESIZABLE);
 
 }
 
 void drawPoint(PointListe* listePoints){
 
-	printf("Dessiner point !\n");
+	printf("drawpoint appelé !\n");
 	PointListe tmp = (PointListe)malloc(sizeof(PointListe));
 	tmp = *listePoints;
 
 
 	while(tmp != NULL){
 		
-		glPointSize(10.0f);
+		glPointSize(5.0f);
 		glBegin(GL_POINTS);;
 		glColor3d(tmp->r,tmp->g,tmp->b);
 		glVertex2f(coorX(tmp->x), coorY(tmp->y)); 
@@ -56,53 +63,59 @@ void drawPoint(PointListe* listePoints){
 
 	}
 
-    
+}
+
+void drawLine(PointListe* listePoints){
+
+	printf("drawline appelé !\n");
+	PointListe tmp = (PointListe)malloc(sizeof(PointListe));
+	tmp = *listePoints;
+
+	while(tmp != NULL){
+
+		if(tmp->next != NULL){
+			glBegin(GL_LINES);
+			glColor3d(tmp->r,tmp->g,tmp->b);
+			glVertex2f(coorX(tmp->x), coorY(tmp->y));
+			glColor3d(tmp->next->r,tmp->next->g,tmp->next->b);
+			glVertex2f(coorX(tmp->next->x), coorY(tmp->next->y));
+			glEnd();
+		}
+
+		tmp = tmp->next;
+
+	}
 
 }
 
-/*void drawLine(SDL_Event e, float tab[]){
+void drawTriangle(PointListe* listePoints){
 
-	drawPoint(e);
+	printf("drawtriangle appelé !\n");
+	PointListe tmp = (PointListe)malloc(sizeof(PointListe));
+	tmp = *listePoints;
 
-    glPointSize(10.0f);
+	while(tmp != NULL){
 
-	printf("Dessiner ligne !\n");
+		if(tmp->next != NULL){ // Si le point traité est suivi d'un autre dans la liste
+			if(tmp->next->next != NULL){ // Si le point traité est suivi de deux autres point dans la liste
+				glBegin(GL_TRIANGLES);
+				glColor3d(tmp->r,tmp->g,tmp->b);
+				glVertex2f(coorX(tmp->x), coorY(tmp->y));
+				glColor3d(tmp->next->r,tmp->next->g,tmp->next->b);
+				glVertex2f(coorX(tmp->next->x), coorY(tmp->next->y));
+				glColor3d(tmp->next->next->r,tmp->next->next->g,tmp->next->next->b);
+				glVertex2f(coorX(tmp->next->next->x), coorY(tmp->next->next->y));
+				glEnd();
+				tmp = tmp->next->next;
+			}
+		}
 
-	glBegin(GL_LINES);
-	glColor3d(0,0,0);
+		tmp = tmp->next;
 
-	//Coordonnées du point précédement enregistré dans tabLine 
-	glVertex2f(-1 + 2. * tab[0] / WINDOW_WIDTH, -(-1 +2. * tab[1] / WINDOW_HEIGHT));
-
-  	//Coordonées du nouveau point cliqué
-  	glVertex2f(-1 + 2. * e.button.x / WINDOW_WIDTH, -(-1 +2. * e.button.y / WINDOW_HEIGHT));
-	glEnd();
+	}
 
 }
 
-void drawTriangle(SDL_Event e, float tab[]){
-
-	drawPoint(e);
-	
-    glPointSize(10.0f);
-
-	printf("Dessiner triangle !\n");
-
-	glBegin(GL_TRIANGLES);
-	glColor3d(0,0,0);
-
-	//Coordonnées du point précédement enregistré dans tabLine 
-	glVertex2f(-1 + 2. * tab[0] / WINDOW_WIDTH, -(-1 +2. * tab[1] / WINDOW_HEIGHT));
-
-	//Coordonnées du point précédement enregistré dans tabLine 
-	glVertex2f(-1 + 2. * tab[2] / WINDOW_WIDTH, -(-1 +2. * tab[3] / WINDOW_HEIGHT));
-
-  	//Coordonées du nouveau point cliqué
-  	glVertex2f(-1 + 2. * e.button.x / WINDOW_WIDTH, -(-1 +2. * e.button.y / WINDOW_HEIGHT));
-
-	glEnd();
-
-}*/
 
 float coorX(float x){
 	return (-1 + 2. * x / WINDOW_WIDTH);
@@ -117,9 +130,9 @@ void drawUnQuad(c1, c2, c3, x1){
 	glBegin(GL_QUADS);  
 	glColor3d(c1,c2,c3);
 	glVertex2f(coorX(x1), coorY(0));
-	glVertex2f(coorX(x1+50), coorY(0));
-	glVertex2f(coorX(x1+50), coorY(400));  
-	glVertex2f(coorX(x1), coorY(400)); 
+	glVertex2f(coorX(x1+(WINDOW_WIDTH/8)), coorY(0));
+	glVertex2f(coorX(x1+(WINDOW_WIDTH/8)), coorY(WINDOW_HEIGHT));  
+	glVertex2f(coorX(x1), coorY(WINDOW_HEIGHT)); 
 	
 	glEnd();   
 
@@ -137,7 +150,7 @@ void drawQuad(){
 		for(c2=0;c2<2;c2++){
 			for(c3=0;c3<2;c3++){
 				drawUnQuad(c1,c2,c3,x1);
-				x1+=50;
+				x1+=(WINDOW_WIDTH/8);
 			}
 		}
 	}       		
@@ -164,8 +177,8 @@ Point* allocPoint(float x, float y, unsigned char r, unsigned char g, unsigned c
 
 }
 
-void addPointToList(Point* point, PointListe* list){
-
+void addPointToList(Point* point, PointListe *list){
+	printf("adddpointtolist appelé \n");
 	if(*list!=NULL){
 
 		PointListe tmp = (PointListe)malloc(sizeof(PointListe));
@@ -181,13 +194,11 @@ void addPointToList(Point* point, PointListe* list){
 		*list = point;
 	}
 
-
-
 }
 
 void drawClean(){    
 
-    glClearColor(1,1,0,1); // definir la couleur de nettoyage (Jaune)
+    glClearColor(0.9,0.9,0.9,1); // definir la couleur de nettoyage (Jaune)
     glClear(GL_COLOR_BUFFER_BIT); // Nettoie la fenetre et appelle la couleur de nettoyage
 
 }
@@ -258,6 +269,83 @@ void deletePoints(PointListe* list){
 	*list = NULL;
 }
 
+void deletePrimitive(PrimitiveListe* list){
+
+	PrimitiveListe tmp;
+	if(*list != NULL){
+		tmp = *list; 
+		*list = (*list)->next;
+		deletePoints(&(tmp->points));
+		free(tmp);
+	}
+	*list = NULL;
+}
+
+Primitive* allocPrimitive(GLenum primitiveType){
+	
+	Primitive *unePrimitive;
+	unePrimitive = (Primitive*)malloc(sizeof(Primitive));
+	if(unePrimitive != NULL){
+		unePrimitive->primitiveType = primitiveType;
+		unePrimitive->points = NULL;
+		unePrimitive->next = NULL;
+	}
+
+	return unePrimitive;
+
+}
+
+void addPrimitive(Primitive* primitive, PrimitiveListe* list){
+
+	printf("addprimitve appelé \n");
+	// Ajout en tête de liste
+	if(*list!=NULL){
+		primitive->next = *list;
+		*list = primitive;
+	}else{
+		printf("OK - add1\n");
+		*list = primitive;
+	}
+}
+
+void drawPrimitives(PrimitiveListe* list){
+	printf("drawPrimitives appelé \n");
+
+	PrimitiveListe tmp = (PrimitiveListe)malloc(sizeof(PrimitiveListe));
+	tmp = *list;
+
+	if(tmp!=NULL){
+		if(tmp->next != NULL){
+			// Fonction récursive pour dessiner d'abord les primitives en fin de liste
+			drawPrimitives(&(tmp->next));
+		}
+
+		switch(tmp->primitiveType){
+
+			case GL_POINTS :
+				drawPoint(&(tmp->points));
+				break;
+
+			case GL_LINES :
+				drawPoint(&(tmp->points));
+				drawLine(&(tmp->points));
+				break;
+
+			case GL_TRIANGLES :
+				drawPoint(&(tmp->points));
+				drawTriangle(&(tmp->points));
+				break;
+
+
+			default:
+				break;
+
+		}
+	}
+	
+
+}
+
 
 
 int main(int argc, char** argv) {
@@ -265,17 +353,23 @@ int main(int argc, char** argv) {
 
 	PointListe listePoints;
 	listePoints = (PointListe)malloc(sizeof(PointListe));
-	if(listePoints!=NULL){
-		listePoints=NULL;
+	if(listePoints==NULL){
+		exit(0);
+	}
+
+	PrimitiveListe listePrimitives;
+	listePrimitives = (Primitive*)malloc(sizeof(Primitive));
+	if(listePrimitives!=NULL){
+		listePrimitives=NULL;
 	}else{
 		exit(0);
 	}
 
+	addPrimitive(allocPrimitive(GL_POINTS), &listePrimitives);
+
 	char tabCoul[4]={0,0,0,'\0'};
 
 	char touche = 'p';
-	float tabLine[3]={0,0,0}; // Toutes les cases valent 0
-	float tabTriangle[5]={0,0,0,0,0}; // Toutes les cases valent 0
 	
     /* Initialisation de la SDL */
     if(-1 == SDL_Init(SDL_INIT_VIDEO)) {
@@ -293,7 +387,7 @@ int main(int argc, char** argv) {
     SDL_WM_SetCaption("TP1 : cmonannif", NULL);
     
     /* Boucle d'affichage */
-    glClearColor(1,1,0,1); // definir la couleur de nettoyage (Jaune)
+    glClearColor(0.9,0.9,0.9,1); // definir la couleur de nettoyage (Jaune)
     glClear(GL_COLOR_BUFFER_BIT); // Nettoie la fenetre et appelle la couleur de nettoyage
 
     int loop = 1;
@@ -301,9 +395,6 @@ int main(int argc, char** argv) {
 
         /* Récupération du temps au début de la boucle */
         Uint32 startTime = SDL_GetTicks();
-        
-        /* Placer ici le code de dessin */
-    	//glClear(GL_COLOR_BUFFER_BIT); // Nettoie la fenetre et appelle la couleur de nettoyage
       
         /* Boucle traitant les evenements */
         SDL_Event e;
@@ -319,8 +410,11 @@ int main(int argc, char** argv) {
             switch(e.type) { // e.type = type d'evnt recu
 
                 case SDL_VIDEORESIZE:
-                    resizeWindow(e);
-                    printf("Il y a redimmensionnement : %d , %d\n", e.resize.w, e.resize.h);
+                	WINDOW_WIDTH = e.resize.w;
+                	WINDOW_HEIGHT = e.resize.h;
+                    resizeWindow();
+                    drawClean();
+                    drawPrimitives(&listePrimitives);
                     break;
 
                 /* Clic souris */
@@ -330,84 +424,81 @@ int main(int argc, char** argv) {
                 	switch(touche){
 
                 		case 'p':
-                			addPointToList(allocPoint(e.button.x, e.button.y, tabCoul[0], tabCoul[1], tabCoul[2]), &listePoints);
-                			drawPoint(&listePoints);
+                			addPointToList(allocPoint(e.button.x, e.button.y, tabCoul[0], tabCoul[1], tabCoul[2]), &(listePrimitives->points));
+                			drawPrimitives(&listePrimitives);
+                			break;
+
+                		case 'l':
+                			addPointToList(allocPoint(e.button.x, e.button.y, tabCoul[0], tabCoul[1], tabCoul[2]), &(listePrimitives->points));
+                			drawPrimitives(&listePrimitives);
+                			break;
+
+                		case 't':
+                			addPointToList(allocPoint(e.button.x, e.button.y, tabCoul[0], tabCoul[1], tabCoul[2]), &(listePrimitives->points));
+                			drawPrimitives(&listePrimitives);
                 			break;
 
                 		case ' ':
                 			printf("Recherche de couleurs\n");
                 			changerCouleur(e.button.x, tabCoul);
                 			break;
-
-                		
-
-                		/*case 'l':
-
-	                		if(tabLine[2] == 0){
-	                			tabLine[0] = e.button.x;
-	                			tabLine[1] = e.button.y;
-	                			tabLine[2] = 1;
-	                			drawPoint(e);
-	                			printf("TabLine x=%f et y=%f\n", tabLine[0], tabLine[1]);
-	                		}else{
-	                			drawLine(e, tabLine);
-	                			int i;
-	                			for(i=0;i<3;i++){
-	                				tabLine[i]=0;
-	                			}
-	                		}
-	                		break;
-
-	                	case 't':
-
-	                		if(tabTriangle[4] == 0){
-	                			tabTriangle[0] = e.button.x;
-	                			tabTriangle[1] = e.button.y;
-	                			tabTriangle[4] = 1;
-	                			drawPoint(e);        
-	                		}else if(tabTriangle[4]==1){
-	                			tabTriangle[2] = e.button.x;
-	                			tabTriangle[3] = e.button.y;
-	                			tabTriangle[4] = 2;
-	                			drawPoint(e);
-	                		}else{
-	                			drawTriangle(e, tabTriangle);
-	                			int i;
-	                			for(i=0;i<5;i++){
-	                				tabTriangle[i]=0;
-	                			}
-	                		}
-	                		break;*/
 	    
                 		default:
                 			break;
                 	}
 
-                    printf("clic en (%d, %d)\n", e.button.x, e.button.y);
+
                     glClearColor(e.button.x/(float)WINDOW_WIDTH,e.button.y/(float)WINDOW_HEIGHT,0,1);
                     break;
 
                 /* Mouvement souris */
                 case SDL_MOUSEMOTION:
-                    //printf("clic en (%d, %d)\n", e.button.x, e.button.y);
                     glClearColor(e.button.x/(float)WINDOW_WIDTH,e.button.y/(float)WINDOW_HEIGHT,0,1);
                     break;
 
                 /* Touche clavier */
                 case SDL_KEYDOWN:
 
+                	switch(e.key.keysym.sym){
 
-                    if(e.key.keysym.sym == 'q'){
-                    	deletePoints(&listePoints);
-                        loop=0;
-                    } else if(e.key.keysym.sym == ' '){
-	                    printf("Touche espace pressée\n");
-	                    drawQuad();
-                    }else if(e.key.keysym.sym == 'd'){
-                		deletePoints(&listePoints);
-                		drawClean();
-                		drawPoint(&listePoints);
-                    }
+                		case 'q' : 
+                			deletePrimitive(&listePrimitives);
+                        	loop=0;
+                			break;
+
+                		case ' ':
+                			printf("Touche espace pressée\n");
+	                    	drawQuad();
+	                    	break;
+
+	                    case 'd':
+	                    	deletePrimitive(&listePrimitives);
+	                    	addPrimitive(allocPrimitive(GL_POINTS), &listePrimitives);
+	                		drawClean();
+	                		break;
+
+	                	case 'l':
+	                		if(touche != 'l'){
+	                			addPrimitive(allocPrimitive(GL_LINES), &listePrimitives);
+	                		}
+	                		break;
+
+	                	case 'p':
+	                		if(touche != 'p'){
+	                			addPrimitive(allocPrimitive(GL_POINTS), &listePrimitives);
+	                		}
+	                		break;
+
+	                	case 't':
+	                		if(touche != 't'){
+	                			addPrimitive(allocPrimitive(GL_TRIANGLES), &listePrimitives);
+	                		}
+	                		break;
+
+	                	default:
+	                		break;
+
+                	}
 
                     /* On determine ce que l'utilisateur souhaite dessiner et on l'enregistre dans 'touche' */
                     if(e.key.keysym.sym != 'd'){
@@ -427,7 +518,7 @@ int main(int argc, char** argv) {
                  	if(e.key.keysym.sym == ' '){
                     printf("Touche espace relarchée\n");
                     drawClean();
-                    drawPoint(&listePoints);
+                    drawPrimitives(&listePrimitives);
                     touche = 'p';
                     }
 
