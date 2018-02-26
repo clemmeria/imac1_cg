@@ -503,6 +503,9 @@ int main(int argc, char** argv) {
                     /* On determine ce que l'utilisateur souhaite dessiner et on l'enregistre dans 'touche' */
                     if(e.key.keysym.sym != 'd'){
                     	touche = e.key.keysym.sym;
+                    }else{
+                    	touche = 'p';
+                    	addPrimitive(allocPrimitive(GL_POINTS), &listePrimitives);
                     }
 
                     
